@@ -9,20 +9,17 @@ function Square({ value, onSquareClick }) {
 }
 
 //** componente Board */
-export default function Board() {
-  const [xIsNext, setXIsNext] = useState(true);
-  const [squares, setSquares] = useState(Array(9).fill(null));
+function Board({ xIsNext, squares, onPlay }) {
 
   function handleClick(i) {
 
-    if (squares[i] || calculateWinner(squares)) {
+    if (calculateWinner(squares) || squares[i]) {
       return; //si el cuadrado ya tiene un valor, no hace nada
     }
 
     const nextSquares = squares.slice();
     xIsNext ? nextSquares[i] = 'X' : nextSquares[i] = 'O'; // if condicional
-    setSquares(nextSquares);
-    setXIsNext(!xIsNext);
+    onPlay(nextSquares);
   }
 
   const winner = calculateWinner(squares); //almacena el ganador
@@ -76,6 +73,32 @@ function calculateWinner(squares) { //calcula el ganador
   }
   return null;
 }
+
+// ** componente Game */
+export default function Game() {
+  // TODO: Levantando el estado de Board a Game.
+  const [xIsNext, setXIsNext] = useState(true);
+  const [history, setHistory] = useState([Array(9).fill(null)]); //el primer elemento del array es un array de 9 elementos rellenados con el valor null
+  const currentSquare = history[history.length - 1]; // almacena el último elemento del array history
+
+  function handlePLay(nextSquares) {
+    setHistory([...history, nextSquares]); // crea una nueva matriz que contiene todos los elementos en history, seguido de nextSquares
+    setXIsNext(!xIsNext); // cambia el estado xIsNext
+  }
+
+  return(
+    <div classNName="game">
+      <div classNName="game-board">
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay}/> 
+      </div>
+      <div className="game-info">
+        <ol>{/*TODO*/}</ol>
+      </div>
+    </div>
+  );
+}
+
+// todo: Mostrar los movimientos anteriores
 
 
 /*Recapitulemos lo que sucede cuando un usuario hace clic en el cuadrado superior izquierdo de su tablero para agregarle una X:
