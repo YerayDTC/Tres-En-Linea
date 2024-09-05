@@ -77,28 +77,56 @@ function calculateWinner(squares) { //calcula el ganador
 // ** componente Game */
 export default function Game() {
   // TODO: Levantando el estado de Board a Game.
-  const [xIsNext, setXIsNext] = useState(true);
   const [history, setHistory] = useState([Array(9).fill(null)]); //el primer elemento del array es un array de 9 elementos rellenados con el valor null
-  const currentSquare = history[history.length - 1]; // almacena el último elemento del array history
+  const [currentMove, setCurrentMove] = useState(0); 
+  const xIsNext = currentMove % 2 === 0; // este estado se actualiza cuando el usuario hace clic en el cuadrado superior izquierdo
+  const currentSquares = history[currentMove];
 
   function handlePLay(nextSquares) {
-    setHistory([...history, nextSquares]); // crea una nueva matriz que contiene todos los elementos en history, seguido de nextSquares
-    setXIsNext(!xIsNext); // cambia el estado xIsNext
+    const nexHistory = [...history.slice(0, currentMove + 1), nextSquares]; // almacena el historial actual con el nuevo estado
+    setHistory(nexHistory);
+    setCurrentMove(nexHistory.length - 1); // almacena el nuevo estado del historial
+  };
+
+  function jumpTo(nextMove) {
+    setCurrentMove(nextMove); // actualizamos el movimiento actual con el que recibimos del parametro
   }
+  
+  // todo: Mostrar los movimientos anteriores
+  // ? los parametros del map son:
+  // moves es un array que contiene todos los elementos de history
+  // squares es una matriz de 9 elementos rellenados con el valor null
+  // move es un índice
+  /*Cuando recorres la matriz history dentro de la función que has pasado a map, 
+  el argumento squares recorre cada elemento de history, y el argumento move recorre 
+  cada índice de la matriz: 0, 1, 2, …. */
+  const moves = history.map((squares, move) => { 
+    let description;
+    if(move > 0) {
+      description = 'Ir al movimiento #' + move;
+    } else {
+      description = 'Ir al inicio del juego';
+    }
+
+    return (
+      <li key={move}>
+        <button onClick = {() => jumpTo(move)}>{description}</button>
+      </li>
+    );
+  });
 
   return(
     <div classNName="game">
       <div classNName="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay}/> 
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePLay} /> 
       </div>
       <div className="game-info">
-        <ol>{/*TODO*/}</ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   );
 }
 
-// todo: Mostrar los movimientos anteriores
 
 
 /*Recapitulemos lo que sucede cuando un usuario hace clic en el cuadrado superior izquierdo de su tablero para agregarle una X:
